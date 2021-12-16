@@ -7,6 +7,8 @@ from pyspark.sql import SparkSession
 import pandas as pd
 import re
 import string
+import pyspark
+from pyspark.ml.feature import Tokenizer
 
 
 class ProcessDataframes:
@@ -17,6 +19,24 @@ class ProcessDataframes:
         spark = SparkSession.builder.appName('ml-testing').getOrCreate()
         df = spark.read.csv(filename, inferSchema=True)
         return df
+
+    @staticmethod
+    def export_dataframe_to_csv(sdf, filename):
+        # export Spark df to a csv file
+        sdf.coalesce(1).write.csv(filename)
+        return True
+
+    @staticmethod
+    def export_pandas_dataframe_to_csv(pdf, filename):
+        # export pandas df to a csv file
+        pdf.to_csv(filename)
+        return True
+
+    @staticmethod
+    def export_dataframe_to_mongodb(processed_tweets):
+        # export Spark df to MongoDB
+        processed_tweets.write.format('mongo').mode('append').save()
+        return True
 
     @staticmethod
     def reduce_to_two_columns(df, one, two):
@@ -39,6 +59,13 @@ class ProcessDataframes:
         spark = SparkSession.builder.appName('ml-testing2').getOrCreate()
         spark.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
         return spark_df.select(one, two).toPandas()
+
+    @staticmethod
+    def convert_tokenized_spark_to_pandas(spark_df):
+        # convert tokenized spark df to pandas df
+        spark = SparkSession.builder.appName('ml-testing4').getOrCreate()
+        spark.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
+        return spark_df.toPandas()
 
     @staticmethod
     def convert_pandas_to_spark(pandas_df):
@@ -68,13 +95,16 @@ class ProcessTweets:
     @staticmethod
     def clean_urls(text):
         # remove web addresses
-        return re.sub('((www.[^s]+) | (http[^s]+) | (@[^s]+))', ' ', text)
+        no_web = re.sub('((www.[^s]+) | (http://[^s]+))', '', text)
+        # remove @mentions
+        no_at = re.sub('@[A-Za-z0-9]+', '', no_web)
+        return no_at
 
     @staticmethod
     def clean_words(text):
         # remove neutral words
-        no_bias_words = ['a', 'an', 'the', 'and', 'or', 'my', 'our', 'to', 'from', 'of', 'for', 'i', 'is', 'are',
-                         'was', 'were', 'in', 'it', 'with']
+        no_bias_words = ['a', 'an', 'the', 'and', 'or', 'my', 'our', 'to', 'from', 'of', 'for', 'i', 'you', 'he', 'she',
+                         'is', 'are', 'was', 'were', 'in', 'it', 'with', 'am', 'has', 'had', 'would', 'could', 'be']
         chopwords = set(no_bias_words)
         return " ".join([word for word in str(text).split() if word not in chopwords])
 
@@ -91,10 +121,18 @@ class ProcessTweets:
         return re.sub('[0-9]+', '', text)
 
     @staticmethod
-    def tokenize_and_stem_tweet(pandas_df, text_column):
-        # tokenize the text in the tweets of pandas df
-        tokenized = TweetTokenizer()
-        pandas_df[text_column] = pandas_df[text_column].apply(tokenized.tokenize)
+    def tokenize_tweets(spark_df, tweet_column):
+        # tokenize the text in the tweets of spark df
+        tokenizer = Tokenizer(inputCol=tweet_column, outputCol='words')
+        tokenized = tokenizer.transform(spark_df)
+        tokenized_twit = ProcessDataframes.reduce_to_two_columns(tokenized, 'score', 'words')
+        # PANDAS CODE: tokenized = TweetTokenizer()
+        # PANDAS CODE: pandas_df[text_column] = pandas_df[text_column].apply(tokenized.tokenize)
+        return tokenized_twit
+
+    @staticmethod
+    def stem_tweet(pandas_df, text_column):
+        # stem words in the text of the tweets of pandas df
         pandas_df[text_column] = pandas_df[text_column].apply(lambda x: ProcessTweets.text_stemmer(x))
         return pandas_df
 
@@ -122,6 +160,7 @@ class ProcessTweets:
         df_modify = ProcessTweets.clean_pandas_tweets(df_modify, 'tweet')
         # convert pandas df back to spark df before tokenizing
         return ProcessDataframes.convert_pandas_to_spark(df_modify)
+
 
 """
     @staticmethod

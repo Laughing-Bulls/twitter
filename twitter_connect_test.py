@@ -86,9 +86,6 @@ if __name__ == '__main__':
         print("Received request from: " + str(addr))
 
         print('start sending data from Twitter to socket')
-        # authenticate based on credentials above
-        # auth.set_access_token(bearer_token_scott)
-        # auth.set_access_token(bearer_token_scott, access_secret)
         # start sending data from the Streaming API
         twitter_stream = Stream(auth, TweetsListener(c_socket))
         twitter_stream.filter(track=twitter_topic, languages=["en"])
