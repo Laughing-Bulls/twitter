@@ -2,12 +2,12 @@
 from random import randint
 import time
 
-""" Creates 8 new files, one by one in 3 seconds intervals. """
+""" Creates 8 new csv files, one by one in 4 seconds intervals. """
 
 def main():
 
     run_number = 8
-    sleep_time = 3
+    interval_time = 4
     a = 1
 
     with open('processed_test_tweets.csv', 'r') as file:
@@ -17,11 +17,11 @@ def main():
         while a <= run_number:
             linecount = len(lines)
             linenumber = randint(0, linecount - 10)
-            with open('output{}.txt'.format(a), 'w') as writefile:
+            with open('output{}.csv'.format(a), 'w') as writefile:
                 writefile.write(' '.join(line for line in lines[linenumber:linenumber + 25]))
-            print('Created new output file output{}.txt'.format(a))
+            print('Created new output file output{}.csv'.format(a))
             a += 1
-            time.sleep(sleep_time)
+            time.sleep(interval_time)
 
     print("That's all, Folks!")
 
