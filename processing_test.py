@@ -4,7 +4,7 @@ from processing import ProcessDataframes
 
 if __name__ == '__main__':
     # get Spark dataframe from csv file
-    filename = 'testdata-manual-2009-06-14.csv'
+    filename = 'training.1600000.processed.noemoticon.csv'
     df = ProcessDataframes.import_data_file(filename)
     # see types -- can also use df.dtypes
     df.printSchema()
@@ -29,10 +29,10 @@ if __name__ == '__main__':
 
     # split df by sentiment score
     pos = ProcessDataframes.subset_of_spark_df(modified_twit, 'score', 4)
-    neut = ProcessDataframes.subset_of_spark_df(modified_twit, 'score', 2)
+    # neut = ProcessDataframes.subset_of_spark_df(modified_twit, 'score', 2)
     neg = ProcessDataframes.subset_of_spark_df(modified_twit, 'score', 0)
     print(pos.toPandas().shape)
-    print(neut.toPandas().shape)
+    #print(neut.toPandas().shape)
     print(neg.toPandas().shape)
 
     # tokenize and stem tweets - adds 'words' column with tokenized array
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     panda_stem_twit.head()
 
     # save processed tweets in a csv file
-    ProcessDataframes.export_pandas_dataframe_to_csv(panda_stem_twit, "processed_test_tweets.csv")
+    ProcessDataframes.export_pandas_dataframe_to_csv(panda_stem_twit, "processed_training_tweets.csv")
 
     # save processed tweets in database
     # ProcessDataframes.export_dataframe_to_mongodb(tokenized_twit)
