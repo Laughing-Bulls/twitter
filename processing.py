@@ -11,7 +11,40 @@ import pyspark
 from pyspark.ml.feature import Tokenizer
 
 
+class ProcessSparkStreaming:
+    """ For i/o associated with Spark Streaming"""
+    # USEFUL SPARK STREAMING COMMANDS
+    # readstream.format("socket") - from Spark session object to read data fom TCP socket
+    # writestream.format("console") - write streaming dataframe to console
+    # print() - Prints the first ten elements of every batch of data in a DStream on the driver node running the application.
+    # saveAsTextFiles(prefix, [suffix]) - Save this DStream’s contents as text files. The file name at each batch interval is generated based on prefix.
+    # saveAsHadoopFiles(prefix, [suffix]) - Save this DStream’s contents as Hadoop files.
+    # saveAsObjectFiles(prefix, [suffix]) - Save this DStream’s contents as SequenceFiles of serialized Java objects.
+    # foreachRDD(func) - Generic output operator that applies a function, func, to each RDD generated from the stream.
+
+    @staticmethod
+    def import_from_csv(filename):
+        # import data to Spark Streaming from csv file
+        pass
+
+    @staticmethod
+    def import_from_db(filename):
+        # import data to Spark Streaming from MongoDB
+        pass
+
+    @staticmethod
+    def export_to_csv(filename):
+        # export data from Spark Streaming to csv file
+        pass
+
+    @staticmethod
+    def export_to_db(filename):
+        # export data from Spark Streaming to MongoDB
+        pass
+
+
 class ProcessDataframes:
+    """ To manipulate Spark and Pandas dataframes"""
 
     @staticmethod
     def import_data_file(filename):
@@ -76,6 +109,7 @@ class ProcessDataframes:
 
 
 class ProcessTweets:
+    """ To manipulate Twitter text data"""
 
     @staticmethod
     def clean_pandas_tweets(pandas_df, text_column):

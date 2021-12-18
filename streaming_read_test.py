@@ -22,9 +22,11 @@ def main():
         .reduceByKey(lambda a, b: a + b)
     counts.pprint()
     ssc.start()
-    ssc.awaitTermination()
+    ssc.awaitTermination(120)
+    ssc.stop()
 
     print("That's all, Folks!")
+
 
 if __name__ == "__main__":
     main()
