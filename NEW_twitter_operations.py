@@ -39,7 +39,7 @@ class Twitter_In:
                        iterations=iterations+1
                        print(tweet_text)
 
-                       # unique delimiter for distinguishing tweet_data
+                       # delimiter for distinguishing tweet_data
                        fulltext="0|~|0|~|0|~|0|~|0|~|"+tweet_text +'\n'
 
                        # echo data

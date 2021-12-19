@@ -6,7 +6,7 @@ import time
 
 def main():
 
-    run_number = 30
+    run_number = 12
     interval_time = 4
     a = 1
 

@@ -39,7 +39,8 @@ class ProcessSparkStreaming:
     @staticmethod
     def export_to_db(filename):
         # export data from Spark Streaming to MongoDB
-        pass
+        print("SAVING TO DATABASE -- really just a cvs output file")
+        return True
 
     @staticmethod
     def process_rdd(time, rdd):
@@ -123,6 +124,17 @@ class ProcessDataframes:
         spark = SparkSession.builder.appName('ml-testing3').getOrCreate()
         spark.conf.set("spark.sql.execution.arrow.pyspark.enabled", "true")
         return spark.createDataFrame(pandas_df)
+
+    @staticmethod
+    def process_tweets(tweet):
+        print("PROCESSING DATAFRAME")
+        half_processed = ProcessDataframes.reduce_to_two_columns(tweet, _c0, _c1)
+        return half_processed
+
+    @staticmethod
+    def add_a_column(df, column):
+        print("JOINING RESULTS TO ORIGINAL TWEET")
+        return df
 
 
 class ProcessTweets:
