@@ -1,14 +1,13 @@
-# pip install pyarrow
-# import dependencies
-import nltk
-from nltk.tokenize import TweetTokenizer
-import pyspark
+# import nltk
+# from nltk.tokenize import TweetTokenizer
+# import numpy as np
+# import pyspark
 from pyspark.sql import SparkSession
-import pandas as pd
+# import pandas as pd
 import re
 import string
-import pyspark
-from pyspark.ml.feature import Tokenizer
+# from pyspark.ml.feature import Tokenizer
+from pyspark.sql import Row, SQLContext
 
 
 class ProcessSparkStreaming:
@@ -41,6 +40,24 @@ class ProcessSparkStreaming:
     def export_to_db(filename):
         # export data from Spark Streaming to MongoDB
         pass
+
+    @staticmethod
+    def process_rdd(time, rdd):
+        # take incoming data from connector for pre-processing and transformation
+        try:
+            sql_context = ProcessSparkStreaming.get_SQL_context(rdd.context)
+            row_rdd = rdd.map(lambda w: Row(word=w))
+            hashtags_df = sql_context.createDataFrame(row_rdd)
+            hashtags_df.registerTempTable("hashtags")
+        except:
+            pass
+
+    @staticmethod
+    def get_SQL_context(spark_context):
+        # SQL context
+        if ('sqlContextSingletonInstance' not in globals()):
+            globals()['sqlContextSingletonInstance'] = SQLContext(spark_context)
+        return globals()['sqlContextSingletonInstance']
 
 
 class ProcessDataframes:
@@ -154,6 +171,7 @@ class ProcessTweets:
         # remove numbers
         return re.sub('[0-9]+', '', text)
 
+    """
     @staticmethod
     def tokenize_tweets(spark_df, tweet_column):
         # tokenize the text in the tweets of spark df
@@ -169,13 +187,14 @@ class ProcessTweets:
         # stem words in the text of the tweets of pandas df
         pandas_df[text_column] = pandas_df[text_column].apply(lambda x: ProcessTweets.text_stemmer(x))
         return pandas_df
-
+    
     @staticmethod
     def text_stemmer(input_text):
         # Convert words to stems
         st = nltk.PorterStemmer()
         text = [st.stem(word) for word in input_text]
         return text
+    """
 
     @staticmethod
     def show_nulls(df):
@@ -194,6 +213,11 @@ class ProcessTweets:
         df_modify = ProcessTweets.clean_pandas_tweets(df_modify, 'tweet')
         # convert pandas df back to spark df before tokenizing
         return ProcessDataframes.convert_pandas_to_spark(df_modify)
+
+    @staticmethod
+    def tag_numbers(new_values, total_sum):
+        # return number of tags or 0 if none
+        return sum(new_values) + (total_sum or 0)
 
 
 """
