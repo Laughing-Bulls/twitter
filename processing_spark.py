@@ -53,6 +53,12 @@ class ProcessSparkStreaming:
         return True
 
     @staticmethod
+    def export_dstream_to_text_file(dstr):
+        # export dstream to a txt file
+        dstr.saveAsTextFiles("out")
+        return True
+
+    @staticmethod
     def export_dataframe_to_mongodb(processed_tweets):
         # export Spark df to MongoDB
         processed_tweets.write.format('mongo').mode('append').save()

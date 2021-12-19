@@ -17,7 +17,7 @@ class ProcessTweets:
     @staticmethod
     def process_tweets(tweet):
         print("PROCESSING DATAFRAME")
-        half_processed = ProcessDataframes.reduce_to_two_columns(tweet, '_c0', '_c1')
+        half_processed = tweet
         return half_processed
 
     @staticmethod

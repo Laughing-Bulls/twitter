@@ -4,9 +4,6 @@
 class AnalyzeDataFrames:
 
     @staticmethod
-    def calculate_score(df):
+    def calculate_score(dstr):
         # DUMMY METHOD
-        numbers = ()
-        for x in range(len(df)):
-            numbers.append(x)
-        return numbers
+        return 0
