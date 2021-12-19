@@ -17,7 +17,7 @@ class ProcessTweets:
     @staticmethod
     def process_tweets(tweet):
         print("PROCESSING DATAFRAME")
-        words = tweet.flatMap(lambda line: line.split(" "))
+        words = tweet.flatMap(lambda line: line.split(" ")) # TRY split() ?
         print(words.pprint())
         return words
 

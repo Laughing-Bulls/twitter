@@ -3,7 +3,7 @@ import requests_oauthlib
 import socket
 import sys
 from twitter_credentials import Credentials
-from NEW_twitter_operations import TwitterIn
+from processing_connection import TwitterIn
 
 # obtain access codes for Twitter account
 oauth_token = Credentials.oauth_token()
