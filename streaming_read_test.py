@@ -1,6 +1,6 @@
 # read test stream of data from newly generated csv files
 
-import sys
+# import sys
 from pyspark import SparkContext
 # from pyspark.sql import SparkSession
 from pyspark.streaming import StreamingContext

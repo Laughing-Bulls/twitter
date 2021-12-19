@@ -2,9 +2,9 @@
 from random import randint
 import time
 
-""" Creates 8 new csv files, one by one in 4 seconds intervals. """
 
 def main():
+    """ Creates 8 new csv files, one by one in 4 seconds intervals. """
 
     run_number = 12
     interval_time = 4
@@ -24,6 +24,7 @@ def main():
             time.sleep(interval_time)
 
     print("That's all, Folks!")
+
 
 if __name__ == '__main__':
     main()

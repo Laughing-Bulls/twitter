@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-class Twitter_In:
+class TwitterIn:
     """ Get Twitter stream"""
 
     @staticmethod

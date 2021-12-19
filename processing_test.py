@@ -1,11 +1,12 @@
 """ Execution script"""
-from processing import ProcessTweets
-from processing import ProcessDataframes
+from processing_dataframes import ProcessDataframes
+from processing_tweets import ProcessTweets
+from processing_spark import ProcessSparkStreaming
 
 if __name__ == '__main__':
     # get Spark dataframe from csv file
     filename = 'training.1600000.processed.noemoticon.csv'
-    df = ProcessDataframes.import_data_file(filename)
+    df = ProcessSparkStreaming.import_data_file(filename)
     # see types -- can also use df.dtypes
     df.printSchema()
     df.show(5)
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     panda_stem_twit.head()
 
     # save processed tweets in a csv file
-    ProcessDataframes.export_pandas_dataframe_to_csv(panda_stem_twit, "processed_training_tweets.csv")
+    ProcessSparkStreaming.export_pandas_dataframe_to_csv(panda_stem_twit, "processed_training_tweets.csv")
 
     # save processed tweets in database
     # ProcessDataframes.export_dataframe_to_mongodb(tokenized_twit)

@@ -3,7 +3,7 @@ import requests_oauthlib
 import socket
 import sys
 from twitter_credentials import Credentials
-from NEW_twitter_operations import Twitter_In
+from NEW_twitter_operations import TwitterIn
 
 # obtain access codes for Twitter account
 oauth_token = Credentials.oauth_token()
@@ -45,5 +45,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 """
 
 # call functions to get tweets and echo
-response = Twitter_In.get_tweets(auth)
-Twitter_In.tweet_streamer(response, conn)
+response = TwitterIn.get_tweets(auth)
+TwitterIn.tweet_streamer(response, conn)
