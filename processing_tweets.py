@@ -17,8 +17,29 @@ class ProcessTweets:
     @staticmethod
     def process_tweets(tweet):
         print("PROCESSING DATAFRAME")
-        half_processed = tweet
-        return half_processed
+        words = tweet.flatMap(lambda line: line.split(" "))
+        print(words.pprint())
+        return words
+
+    @staticmethod
+    def process_word(oldword):
+        # PROCESS WORDS FOR ANALYSIS -- IN PROGRESS
+        print(oldword)
+        newword = re.sub('((www.[^s]+) | (http://[^s]+))', '', oldword)
+        newword = re.sub('@[A-Za-z0-9]+', '', newword)
+        """
+        newword = lowercase(newword)
+        if newword in no_bias_words = ['a', 'an', 'the', 'and', 'or', 'my', 'our', 'to', 'from', 'of', 'for', 'i', 'you', 'he', 'she',
+                         'is', 'are', 'was', 'were', 'in', 'it', 'with', 'am', 'has', 'had', 'would', 'could', 'be']:
+            newword = ""
+        if newword in punctuation or newword in number:
+            newword = ""
+        if newword != "":
+            st = nltk.PorterStemmer()
+            text = st.stem(word)
+        """
+        print(newword)
+        return newword
 
     @staticmethod
     def clean_pandas_tweets(pandas_df, text_column):

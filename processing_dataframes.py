@@ -50,6 +50,9 @@ class ProcessDataframes:
         return spark.createDataFrame(pandas_df)
 
     @staticmethod
-    def add_a_column(df, column):
+    def add_a_column(dstr, column):
         print("JOINING RESULTS TO ORIGINAL TWEET")
-        return df
+        """
+        # combined=dstr.union(column)
+        """
+        return dstr

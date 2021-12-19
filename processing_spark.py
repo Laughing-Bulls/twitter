@@ -69,6 +69,7 @@ class ProcessSparkStreaming:
         # export data from Spark Streaming to MongoDB
         ProcessSparkStreaming.export_dataframe_to_csv(sdf, "database-csv-output.csv")
         print("SAVING TO DATABASE -- really just a cvs output file")
+
         """
         from pymongo import MongoClient
 
