@@ -14,7 +14,7 @@ from machine_learning import AnalyzeDataFrames
 
 
 # create Spark Conf
-interval = 1
+interval = 2
 conf = SparkConf()
 conf.setAppName("TwitterStreamApp")
 sc = SparkContext(conf=conf)
@@ -26,20 +26,16 @@ ssc.checkpoint("checkpoint_TwitterApp")
 # pprint() can output file to terminal from stream
 dataStream = ssc.socketTextStream("127.0.1.1", 5555)
 print("LISTENING TO SOCKET")
-print(dataStream.pprint())
-# words = dataStream.flatMap(lambda line: line.split(" "))
-
 
 # send tweet text for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
-print(dataStream.pprint(1))
+print(processed_tweets.pprint(1))
 scores = AnalyzeDataFrames.calculate_score(processed_tweets)
-print(scores)
 print("ANALYSIS COMPLETE")
 
 # construct and save results to database
 # final_result = ProcessDataframes.add_a_column(dataStream, scores)
-ProcessSparkStreaming.export_dstream_to_text_file(dataStream)
+ProcessSparkStreaming.export_dstream_to_text_file(processed_tweets)
 print("OUTPUT SAVE COMPLETE")
 
 # map hashtags with Key: Word, Value: 1
