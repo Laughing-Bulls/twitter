@@ -1,8 +1,9 @@
 """ Execute to connect with Twitter and echo content """
 import requests_oauthlib
 import socket
+import sys
 from twitter_credentials import Credentials
-from NEW_twitter_operations import Twitter_In
+from NEW_twitter_operations import TwitterIn
 
 # obtain access codes for Twitter account
 oauth_token = Credentials.oauth_token()
@@ -17,10 +18,17 @@ tcp_host = '127.0.1.1'
 tcp_port = 5555
 conn = None
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print("SOCKET CREATED")
+except socket.error as msg:
+    print("FAILED TO CREATE A SOCKET " + str(msg))
+    sys.exit()
+
 s.bind((tcp_host, tcp_port))
 s.listen(1)
 conn, addr = s.accept()
+
 
 """
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -37,5 +45,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 """
 
 # call functions to get tweets and echo
-response = Twitter_In.get_tweets(auth)
-Twitter_In.tweet_streamer(response, conn)
+response = TwitterIn.get_tweets(auth)
+TwitterIn.tweet_streamer(response, conn)
