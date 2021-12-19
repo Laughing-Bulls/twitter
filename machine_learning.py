@@ -1,16 +1,16 @@
 """ THIS IS WHERE MACHINE LEARNING WILL BE APPLIED TO RETURN SCORE"""
 
+# install pyspark if needed
+from pyspark.ml.feature import HashingTF
+from pyspark import SparkConf, SparkContext
+from pyspark.ml.classification import NaiveBayes
+from pyspark.sql.session import SparkSession
+from pyspark.sql.functions import split, regexp_replace
 
 class AnalyzeDataFrames:
 
     def train_model_naive_bayes(processed_train_file):
-        # install pyspark
-        from pyspark.ml.feature import HashingTF
-        from pyspark import SparkConf, SparkContext
-        from pyspark.ml.classification import NaiveBayes
-        from pyspark.sql.session import SparkSession
-        from pyspark.sql.functions import split, regexp_replace
-
+        
         # Boilerplate Spark stuff:
         conf = SparkConf().setMaster("local").setAppName("SparkDecisionTree")
         sc = SparkContext(conf = conf)
