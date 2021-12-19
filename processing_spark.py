@@ -7,6 +7,7 @@ from pyspark.sql import SparkSession
 # import re
 # import string
 # from pyspark.ml.feature import Tokenizer
+from pymongo import MongoClient
 from pyspark.sql import Row, SQLContext
 # from processing_dataframes import ProcessDataframes
 
@@ -59,32 +60,43 @@ class ProcessSparkStreaming:
         return True
 
     @staticmethod
+    def setup_mongodb():
+        # create and connect to MongoDB
+        port = 27017
+        conn = MongoClient('localhost', port)
+        mdb = conn.dabasename
+        collection_db = mdb['TwitterStreaming']
+        print("MONGO DATABASE IS CREATED")
+        return collection_db
+
+    @staticmethod
     def export_dataframe_to_mongodb(processed_tweets):
         # export Spark df to MongoDB
+        collection = ProcessSparkStreaming.setup_mongodb()
         processed_tweets.write.format('mongo').mode('append').save()
         return True
 
     @staticmethod
-    def export_to_db(sdf):
-        # export data from Spark Streaming to MongoDB
-        ProcessSparkStreaming.export_dataframe_to_csv(sdf, "database-csv-output.csv")
-        print("SAVING TO DATABASE -- really just a cvs output file")
+    def add_data_to_mongodb(dstr, score):
+        # export dStream json from Spark Streaming to MongoDB
+        document = {"Tweet_Text": dstr, "Sentiment_Score": score}
+        collection_db = ProcessSparkStreaming.setup_mongodb()
+        # MongoDB automatically adds timestamp as part of '_id' key
+        collection_db.insert_one(document, bypass_document_validation=False, session=None)
+        print("SAVED TO MONGO DATABASE")
+        return True
 
-        """
-        from pymongo import MongoClient
-
+    """
+        # multiple records
+        for record in records.vales(): collection_db.insert_one(record) 
+    
         uri = "mongodb+srv://cluster0.vtked.mongodb.net/myFirstDatabase?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority"
-        client = MongoClient(uri,
-                     tls=True,
-                     tlsCertificateKeyFile='<path_to_certificate>')
-
+        client = MongoClient(uri, tls=True, tlsCertificateKeyFile='<path_to_certificate>')
         db = client['testDB']
         collection = db['testCol']
         doc_count = collection.count_documents({})
         print(doc_count)
         """
-
-        return True
 
     @staticmethod
     def process_rdd(time, rdd):

@@ -29,7 +29,6 @@ print("LISTENING TO SOCKET")
 
 # send tweet text for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
-print(processed_tweets.pprint(1))
 scores = AnalyzeDataFrames.calculate_score(processed_tweets)
 print("ANALYSIS COMPLETE")
 
