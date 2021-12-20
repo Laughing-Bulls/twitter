@@ -6,6 +6,7 @@ from pyspark.ml.feature import HashingTF
 from pyspark.ml.classification import NaiveBayes
 from pyspark.sql.functions import split, regexp_replace
 import pandas as pd
+from pyspark.sql.types import ArrayType, StringType
 
 class AnalyzeDataFrames:
 
@@ -42,12 +43,9 @@ class AnalyzeDataFrames:
         return 4
         """
 
-        # tweet_words must have a format "['this', 'is', 'a', 'processed', 'tweet']"
+        # tweet_words must have a format ['this', 'is', 'a', 'processed', 'tweet']
         
-        d = {'words': [tweet_words]}
-        column = pd.DataFrame(data=d).to_csv('column.csv')
-        column = spark.read.csv('column.csv', inferSchema=True, header=True)
-        column = column.withColumn('words',split(regexp_replace(column["words"], '\[|\]',''),',').cast('array<string>'))
+        column = spark.createDataFrame([tweet_words], ArrayType(StringType())).toDF("words")
 
         hashTF = HashingTF(inputCol="words", outputCol="numerical")
         num_column= hashTF.transform(column).select('words', 'numerical')
@@ -58,7 +56,7 @@ class AnalyzeDataFrames:
         results = results_naive_bayes.toPandas()
         prediction = results.iloc[0,0]
         
-        return prediction
+        return tweet_words, prediction
 
 
 
