@@ -17,9 +17,12 @@ class ProcessTweets:
     @staticmethod
     def process_tweets(tweet):
         print("PROCESSING DATAFRAME")
+        tweet_words = ['hello']
         words = tweet.flatMap(lambda line: line.split(" ")) # TRY split() ?
-        print(words.pprint())
-        return words
+        words.foreachRDD(lambda rdd: tweet_words.append(rdd.collect()))
+        tweet_words.append('goodbye')
+        print(words)
+        return tweet_words
 
     @staticmethod
     def process_word(oldword):

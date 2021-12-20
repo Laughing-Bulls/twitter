@@ -7,6 +7,7 @@ from pyspark.sql import SparkSession
 # import re
 # import string
 # from pyspark.ml.feature import Tokenizer
+import pymongo
 from pymongo import MongoClient
 from pyspark.sql import Row, SQLContext
 # from processing_dataframes import ProcessDataframes
