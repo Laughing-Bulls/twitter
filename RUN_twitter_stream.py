@@ -1,14 +1,8 @@
-""" Set up to receive tweet streams"""
-# import sys
+""" Receive tweet streams and process them with ML algorithm"""
 import time
-# import pyspark
-# import pyspark.sql
-# import pyspark.streaming
-# from pyspark.sql import Row,SQLContext
 from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
 from processing_spark import ProcessSparkStreaming
-# from processing_dataframes import ProcessDataframes
 from processing_tweets import ProcessTweets
 from machine_learning import AnalyzeDataFrames
 
@@ -22,30 +16,24 @@ sc.setLogLevel("ERROR")
 ssc = StreamingContext(sc, interval)
 ssc.checkpoint("checkpoint_TwitterApp")
 
+# train machine learning model
+processed_train_file = "processed_training_tweets.csv"
+naive_bayes = AnalyzeDataFrames.train_naive_bayes(processed_train_file, sc)
+
 # establish connection and collect data
-# pprint() can output file to terminal from stream?
 dataStream = ssc.socketTextStream("127.0.1.1", 5555)
 print("LISTENING TO SOCKET")
 
-# send tweet text for analysis
+# process tweets and send text to learning algorithm for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
-processed_train_file = "processed_training_tweets_SMALL.csv"
-naive_bayes = AnalyzeDataFrames.train_naive_bayes(processed_train_file, sc)
 scores = AnalyzeDataFrames.calculate_score(naive_bayes, processed_tweets)
 
 # construct and save results to database
-# final_result = ProcessDataframes.add_a_column(dataStream, scores)
-ProcessSparkStreaming.export_dstream_to_text_file(dataStream)
-# TO USE A DATABASE INSTEAD
-# ProcessSparkStreaming.add_data_to_mongodb(processed_tweets, scores)
-
-# map hashtags with Key: Word, Value: 1
-# hashtags = words.map(lambda x: (x, 1))
-# tags_totals = hashtags.updateStateByKey(ProcessTweets.tag_numbers)
-# tags_totals.foreachRDD(ProcessSparkStreaming.process_rdd)
+ProcessSparkStreaming.add_data_to_mongodb(dataStream, processed_tweets, scores)
 
 # Start Stream Analysis, use time delay for tweet collection
 # stop stream service after delay for data capture
+stream_time = 60
 ssc.start()
-time.sleep(60)
+time.sleep(stream_time)
 ssc.stop()

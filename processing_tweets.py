@@ -17,7 +17,7 @@ class ProcessTweets:
     @staticmethod
     def process_tweets(tweet):
         # take dStream of tweets, process words, and return them as a list to analyze
-        print("PROCESSING DATAFRAME")
+        print("PROCESSING DSTREAM")
         rdd_words = []
         words = tweet.flatMap(lambda line: line.split(" ")) # TRY split() ?
         words.foreachRDD(lambda rdd: rdd_words.append(rdd.collect()))
