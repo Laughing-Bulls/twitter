@@ -35,7 +35,7 @@ scores = AnalyzeDataFrames.calculate_score(naive_bayes, processed_tweets)
 
 # construct and save results to database
 # final_result = ProcessDataframes.add_a_column(dataStream, scores)
-ProcessSparkStreaming.export_dstream_to_text_file(processed_tweets)
+ProcessSparkStreaming.export_dstream_to_text_file(dataStream)
 # TO USE A DATABASE INSTEAD
 # ProcessSparkStreaming.add_data_to_mongodb(processed_tweets, scores)
 
