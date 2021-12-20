@@ -36,9 +36,9 @@ class ProcessSparkStreaming:
         return True
 
     @staticmethod
-    def export_dstream_to_text_file(dstr):
+    def export_dstream_to_text_file(dstr, type):
         # export dstream to a txt file
-        dstr.saveAsTextFiles("out")
+        dstr.saveAsTextFiles(type)
         print("OUTPUT SAVE COMPLETE")
         return True
 
@@ -60,16 +60,22 @@ class ProcessSparkStreaming:
         return True
 
     @staticmethod
-    def add_data_to_mongodb(dstr, tweet, score):
+    def add_data_to_mongodb(file_object, dstr, tweet_and_score):
         # export dStream json from Spark Streaming to MongoDB
         try:
-            document = {"Tweet_Text": tweet, "Sentiment_Score": score}
+            original = dstr.collect()
+            for row in original:
+                tweet_string = ' '.join([str(row)])
+            document = {"Original_Tweet": tweet_string, "Processed_Tweet_Text_and_Score": tweet_and_score}
             collection_db = ProcessSparkStreaming.setup_mongodb()
             # MongoDB automatically adds timestamp as part of '_id' key
             collection_db.insert_one(document, bypass_document_validation=False, session=None)
             print("SAVED TO MONGO DATABASE")
         except:
-            ProcessSparkStreaming.export_dstream_to_text_file(dstr)
+            ProcessSparkStreaming.export_dstream_to_text_file(dstr, "raw")
+            ProcessSparkStreaming.export_dstream_to_text_file(tweet_and_score, "out")
+            #tweet_string = ' '.join([str(item) for item in tweet_and_score])
+            #file_object.write(tweet_string + '\n')
             print("SAVED TO TEXT FILE")
         return True
 

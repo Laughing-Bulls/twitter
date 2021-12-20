@@ -4,7 +4,7 @@ from pyspark import SparkConf, SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.sql.session import SparkSession
 from processing_spark import ProcessSparkStreaming
-from processing_tweets import ProcessTweets
+# from processing_tweets import ProcessTweets
 from machine_learning import AnalyzeDataFrames
 
 
@@ -27,11 +27,11 @@ dataStream = ssc.socketTextStream("127.0.1.1", 5555)
 print("LISTENING TO SOCKET")
 
 # process tweets and send text to learning algorithm for analysis
-processed_tweets = ProcessTweets.process_tweets(dataStream)
-scores = AnalyzeDataFrames.calculate_score(naive_bayes, processed_tweets, spark)
+processed_tweets_with_scores = AnalyzeDataFrames.calculate_score(naive_bayes, dataStream, spark)
 
-# construct and save results to database
-ProcessSparkStreaming.add_data_to_mongodb(dataStream, processed_tweets, scores)
+# construct and save results to database or text file, if database not connected
+file_object = open('output_analyzed_stream.txt', 'a+')
+ProcessSparkStreaming.add_data_to_mongodb(file_object, dataStream, processed_tweets_with_scores)
 
 # Start Stream Analysis, use time delay for tweet collection
 # stop stream service after delay for data capture
@@ -39,3 +39,5 @@ stream_time = 60
 ssc.start()
 time.sleep(stream_time)
 ssc.stop()
+file_object.close()
+print("That's all, Folks!")

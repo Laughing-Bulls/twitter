@@ -19,14 +19,12 @@ class ProcessTweets:
         # take dStream of tweets, process words, and return them as a list to analyze
         print("PROCESSING DSTREAM")
         rdd_words = []
-        words = tweet.flatMap(lambda line: line.split(" ")) # TRY split() ?
+        words = tweet.flatMap(lambda line: line.split(" "))
         words.foreachRDD(lambda rdd: rdd_words.append(rdd.collect()))
-        tweet_words = ['hello']
+        tweet_words = []
         for word in rdd_words:
             processed_word = ProcessTweets.process_word(word)
             tweet_words.append(processed_word)
-        tweet_words.append('goodbye')
-        print(tweet_words)
         return tweet_words
 
     @staticmethod

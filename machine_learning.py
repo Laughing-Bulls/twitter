@@ -1,12 +1,13 @@
 """ THIS IS WHERE MACHINE LEARNING WILL BE APPLIED TO RETURN SCORE"""
-
 # install pyspark if needed
 from pyspark.ml.feature import HashingTF
 # from pyspark import SparkConf, SparkContext
 from pyspark.ml.classification import NaiveBayes
 from pyspark.sql.functions import split, regexp_replace
-import pandas as pd
+# import pandas as pd
 from pyspark.sql.types import ArrayType, StringType
+from processing_tweets import ProcessTweets
+
 
 class AnalyzeDataFrames:
 
@@ -27,7 +28,7 @@ class AnalyzeDataFrames:
         return naive_bayes
 
     @staticmethod
-    def calculate_score(naive_bayes, tweet_words, spark):
+    def calculate_score(naive_bayes, dataStream, spark):
         """
         #spark = SparkSession(sc) 
         # test = spark.read.csv(dstr, inferSchema=True, header=True)
@@ -42,10 +43,11 @@ class AnalyzeDataFrames:
         print("ANALYSIS COMPLETE")
         return 4
         """
-
-        # tweet_words must have a format ['this', 'is', 'a', 'processed', 'tweet']
+        # preprocess the words in the tweets
+        processed_words = ProcessTweets.process_tweets(dataStream)
+        # processed_words have a format ['this', 'is', 'a', 'processed', 'tweet']
         
-        column = spark.createDataFrame([tweet_words], ArrayType(StringType())).toDF("words")
+        column = spark.createDataFrame([processed_words], ArrayType(StringType())).toDF("words")
 
         hashTF = HashingTF(inputCol="words", outputCol="numerical")
         num_column= hashTF.transform(column).select('words', 'numerical')
@@ -55,8 +57,16 @@ class AnalyzeDataFrames:
 
         results = results_naive_bayes.toPandas()
         prediction = results.iloc[0,0]
+
+        if processed_words:
+            tweet_words_with_score = processed_words.append(str(prediction))
+            print("SUCCESSFUL ANALYSIS OF PROCESSED WORDS")
+        else:
+            tweet_words_with_score = ["The input words list is:", "EMPTY", "The score is:", str(prediction)]
+
+        processed_dataStream = dataStream.map(lambda rdd: rdd + "  SENTIMENT SCORE: " + str(prediction))
         
-        return tweet_words, prediction
+        return processed_dataStream
 
 
 
