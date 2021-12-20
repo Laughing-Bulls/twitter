@@ -4,18 +4,13 @@
 from pyspark.ml.feature import HashingTF
 # from pyspark import SparkConf, SparkContext
 from pyspark.ml.classification import NaiveBayes
-from pyspark.sql.session import SparkSession
 from pyspark.sql.functions import split, regexp_replace
-
+import pandas as pd
 
 class AnalyzeDataFrames:
 
     @staticmethod
-    def train_naive_bayes(processed_train_file, sc):
-        # Boilerplate Spark stuff:
-        #conf = SparkConf().setMaster("local").setAppName("SparkDecisionTree")
-        #sc = SparkContext(conf = conf)
-        spark = SparkSession(sc)
+    def train_naive_bayes(processed_train_file, spark):
 
         # We read the processed data files
         # Currently using processed_training_tweets_SMALL.csv, but should try to use the larger file 
@@ -31,7 +26,7 @@ class AnalyzeDataFrames:
         return naive_bayes
 
     @staticmethod
-    def calculate_score(naive_bayes, tweet_words):
+    def calculate_score(naive_bayes, tweet_words, spark):
         """
         #spark = SparkSession(sc) 
         # test = spark.read.csv(dstr, inferSchema=True, header=True)
@@ -42,7 +37,29 @@ class AnalyzeDataFrames:
         test= hashTF.transform(test).select('score', 'words', 'numerical')
 
         return naive_bayes.transform(test).select("score").replace(1.0, 4.0)
-        """
+        
         print("ANALYSIS COMPLETE")
         return 4
+        """
+
+        # tweet_words must have a format "['this', 'is', 'a', 'processed', 'tweet']"
+        
+        d = {'words': [tweet_words]}
+        column = pd.DataFrame(data=d).to_csv('column.csv')
+        column = spark.read.csv('column.csv', inferSchema=True, header=True)
+        column = column.withColumn('words',split(regexp_replace(column["words"], '\[|\]',''),',').cast('array<string>'))
+
+        hashTF = HashingTF(inputCol="words", outputCol="numerical")
+        num_column= hashTF.transform(column).select('words', 'numerical')
+
+        pred_naive_bayes = naive_bayes.transform(num_column)
+        results_naive_bayes = pred_naive_bayes.select("prediction").replace(1.0, 4.0)
+
+        results = results_naive_bayes.toPandas()
+        prediction = results.iloc[0,0]
+        
+        return prediction
+
+
+
         
