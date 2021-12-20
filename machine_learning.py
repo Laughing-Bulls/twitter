@@ -9,11 +9,10 @@ from pyspark.sql.functions import split, regexp_replace
 
 class AnalyzeDataFrames:
 
-    def calculate_score(processed_train_file, dstr):
-
+    def train_naive_bayes(processed_train_file,sc):
         # Boilerplate Spark stuff:
-        conf = SparkConf().setMaster("local").setAppName("SparkDecisionTree")
-        sc = SparkContext(conf = conf)
+        #conf = SparkConf().setMaster("local").setAppName("SparkDecisionTree")
+        #sc = SparkContext(conf = conf)
         spark = SparkSession(sc)
 
         # We read the processed data files
@@ -27,7 +26,9 @@ class AnalyzeDataFrames:
 
         # Naive Bayes Training
         naive_bayes = NaiveBayes(labelCol = "score", featuresCol="numerical", smoothing=1.0, modelType="multinomial").fit(num_train)
-        
+        return naive_bayes
+    
+    def calculate_score(naive_bayes, dstr):     
         return naive_bayes.transform(dstr).select("score").replace(1.0, 4.0)
 
     

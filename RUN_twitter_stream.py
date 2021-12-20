@@ -30,7 +30,8 @@ print("LISTENING TO SOCKET")
 # send tweet text for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
 processed_train_file = "processed_training_tweets_SMALL.csv"
-scores = AnalyzeDataFrames.calculate_score(processed_train_file, processed_tweets)
+naive_bayes = AnalyzeDataFrames.train_naive_bayes(processed_train_file,sc)
+scores = AnalyzeDataFrames.calculate_score(naive_bayes, processed_tweets)
 print("ANALYSIS COMPLETE")
 
 # construct and save results to database
