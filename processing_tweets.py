@@ -1,4 +1,4 @@
-# import nltk
+import nltk
 # from nltk.tokenize import TweetTokenizer
 # import numpy as np
 # import pyspark
@@ -16,32 +16,45 @@ class ProcessTweets:
 
     @staticmethod
     def process_tweets(tweet):
+        # take dStream of tweets, process words, and return them as a list to analyze
         print("PROCESSING DATAFRAME")
-        tweet_words = ['hello']
+        rdd_words = []
         words = tweet.flatMap(lambda line: line.split(" ")) # TRY split() ?
-        words.foreachRDD(lambda rdd: tweet_words.append(rdd.collect()))
+        words.foreachRDD(lambda rdd: rdd_words.append(rdd.collect()))
+        tweet_words = ['hello']
+        for word in rdd_words:
+            processed_word = ProcessTweets.process_word(word)
+            tweet_words.append(processed_word)
         tweet_words.append('goodbye')
-        print(words)
+        print(tweet_words)
         return tweet_words
 
     @staticmethod
     def process_word(oldword):
-        # PROCESS WORDS FOR ANALYSIS -- IN PROGRESS
-        print(oldword)
-        newword = re.sub('((www.[^s]+) | (http://[^s]+))', '', oldword)
-        newword = re.sub('@[A-Za-z0-9]+', '', newword)
-        """
-        newword = lowercase(newword)
-        if newword in no_bias_words = ['a', 'an', 'the', 'and', 'or', 'my', 'our', 'to', 'from', 'of', 'for', 'i', 'you', 'he', 'she',
-                         'is', 'are', 'was', 'were', 'in', 'it', 'with', 'am', 'has', 'had', 'would', 'could', 'be']:
+        # PROCESS WORDS FOR ANALYSIS
+        # Make all letters in the word lowercase
+        newword = oldword.lower()
+        # Ignore words that are URLs
+        if newword[:3] == "www" or newword[:4] == "http":
             newword = ""
-        if newword in punctuation or newword in number:
+        # Ignore Twitter tags, i.e. @elonmusk
+        if newword[:1] == "@":
             newword = ""
+        # Ignore any word that is a neutral or no-bias word
+        no_bias_words = ['a', 'an', 'the', 'and', 'or', 'my', 'our', 'to', 'from', 'of', 'for',
+                         'is', 'are', 'was', 'were', 'in', 'it', 'with', 'am', 'has', 'had', 'would', 'could']
+        if newword in no_bias_words:
+            newword = ""
+        # Ignore standalone punctuation
+        if newword in string.punctuation:
+            newword = ""
+        # Ignore numbers
+        if newword.isnumeric():
+            newword = ""
+        # Stem words that have made it through processing
         if newword != "":
             st = nltk.PorterStemmer()
-            text = st.stem(word)
-        """
-        print(newword)
+            text = st.stem(newword)
         return newword
 
     @staticmethod
