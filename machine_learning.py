@@ -2,15 +2,16 @@
 
 # install pyspark if needed
 from pyspark.ml.feature import HashingTF
-from pyspark import SparkConf, SparkContext
+# from pyspark import SparkConf, SparkContext
 from pyspark.ml.classification import NaiveBayes
 from pyspark.sql.session import SparkSession
 from pyspark.sql.functions import split, regexp_replace
 
+
 class AnalyzeDataFrames:
 
     @staticmethod
-    def train_naive_bayes(processed_train_file,sc):
+    def train_naive_bayes(processed_train_file, sc):
         # Boilerplate Spark stuff:
         #conf = SparkConf().setMaster("local").setAppName("SparkDecisionTree")
         #sc = SparkContext(conf = conf)
@@ -19,18 +20,18 @@ class AnalyzeDataFrames:
         # We read the processed data files
         # Currently using processed_training_tweets_SMALL.csv, but should try to use the larger file 
         train = spark.read.csv(processed_train_file, inferSchema=True, header=True)
-        train = train.withColumn('words',split(regexp_replace(train["words"], '\[|\]',''),',').cast('array<string>'))
+        train = train.withColumn('words', split(regexp_replace(train["words"], '\[|\]', ''), ',').cast('array<string>'))
 
         # We now transform the words to a numerical number and keep track of the count
         hashTF = HashingTF(inputCol="words", outputCol="numerical")
-        num_train= hashTF.transform(train).select('score', 'words', 'numerical')
+        num_train = hashTF.transform(train).select('score', 'words', 'numerical')
 
         # Naive Bayes Training
-        naive_bayes = NaiveBayes(labelCol = "score", featuresCol="numerical", smoothing=1.0, modelType="multinomial").fit(num_train)
+        naive_bayes = NaiveBayes(labelCol="score", featuresCol="numerical", smoothing=1.0, modelType="multinomial").fit(num_train)
         return naive_bayes
 
     @staticmethod
-    def calculate_score(naive_bayes, dstr): 
+    def calculate_score(naive_bayes, tweet_words):
         """
         #spark = SparkSession(sc) 
         # test = spark.read.csv(dstr, inferSchema=True, header=True)
@@ -42,5 +43,6 @@ class AnalyzeDataFrames:
 
         return naive_bayes.transform(test).select("score").replace(1.0, 4.0)
         """
+        print("ANALYSIS COMPLETE")
         return 4
         

@@ -58,6 +58,7 @@ class ProcessSparkStreaming:
     def export_dstream_to_text_file(dstr):
         # export dstream to a txt file
         dstr.saveAsTextFiles("out")
+        print("OUTPUT SAVE COMPLETE")
         return True
 
     @staticmethod

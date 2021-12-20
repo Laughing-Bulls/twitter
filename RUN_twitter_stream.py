@@ -23,21 +23,21 @@ ssc = StreamingContext(sc, interval)
 ssc.checkpoint("checkpoint_TwitterApp")
 
 # establish connection and collect data
-# pprint() can output file to terminal from stream
+# pprint() can output file to terminal from stream?
 dataStream = ssc.socketTextStream("127.0.1.1", 5555)
 print("LISTENING TO SOCKET")
 
 # send tweet text for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
 processed_train_file = "processed_training_tweets_SMALL.csv"
-naive_bayes = AnalyzeDataFrames.train_naive_bayes(processed_train_file,sc)
+naive_bayes = AnalyzeDataFrames.train_naive_bayes(processed_train_file, sc)
 scores = AnalyzeDataFrames.calculate_score(naive_bayes, processed_tweets)
-print("ANALYSIS COMPLETE")
 
 # construct and save results to database
 # final_result = ProcessDataframes.add_a_column(dataStream, scores)
 ProcessSparkStreaming.export_dstream_to_text_file(processed_tweets)
-print("OUTPUT SAVE COMPLETE")
+# TO USE A DATABASE INSTEAD
+# ProcessSparkStreaming.add_data_to_mongodb(processed_tweets, scores)
 
 # map hashtags with Key: Word, Value: 1
 # hashtags = words.map(lambda x: (x, 1))
