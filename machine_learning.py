@@ -28,11 +28,11 @@ class AnalyzeDataFrames:
         naive_bayes = NaiveBayes(labelCol = "score", featuresCol="numerical", smoothing=1.0, modelType="multinomial").fit(num_train)
         return naive_bayes
     
-    def calculate_score(naive_bayes, dstr, sc): 
+    def calculate_score(naive_bayes, dstr): 
 
-        spark = SparkSession(sc) 
-        test = spark.read.csv(dstr, inferSchema=True, header=True)
-        test = test.withColumn('words',split(regexp_replace(test["words"], '\[|\]',''),',').cast('array<string>'))
+        #spark = SparkSession(sc) 
+        # test = spark.read.csv(dstr, inferSchema=True, header=True)
+        test = dstr.withColumn('words',split(regexp_replace(dstr["words"], '\[|\]',''),',').cast('array<string>'))
 
         # We now transform the words to a numerical number and keep track of the count
         hashTF = HashingTF(inputCol="words", outputCol="numerical")
