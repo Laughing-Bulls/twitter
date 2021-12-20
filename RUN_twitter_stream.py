@@ -29,7 +29,8 @@ print("LISTENING TO SOCKET")
 
 # send tweet text for analysis
 processed_tweets = ProcessTweets.process_tweets(dataStream)
-scores = AnalyzeDataFrames.calculate_score(processed_tweets)
+processed_train_file = "processed_training_tweets_SMALL.csv"
+scores = AnalyzeDataFrames.calculate_score(processed_train_file, processed_tweets)
 print("ANALYSIS COMPLETE")
 
 # construct and save results to database
